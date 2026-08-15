@@ -742,6 +742,17 @@ function gameResult(title, ok, tot, wrong, retry, score){
     <ul style="font-size:13.5px">${wrong.map(w=>`<li>${w}</li>`).join('')}</ul></div>`
    :`<div class="card"><b class="hi">틀린 문제가 하나도 없습니다.</b></div>`}
   <div id="rcbox"></div>`;
+  // 결과 제출 버튼 — ?rc=<교사 Apps Script exec> 로 열었을 때만 보입니다
+  const hasRC=(window.ResultCollector&&ResultCollector.config&&ResultCollector.config.endpoint)||/[?&]rc=/.test(location.search);
+  if(hasRC){
+    $('rcbox').innerHTML=`<button class="btn" id="rcGo" style="width:100%;background:linear-gradient(180deg,#3ad995,#22a873)">📨 선생님께 결과 제출</button>`;
+    $('rcGo').onclick=()=>{
+      if(!window.ResultCollector) return;
+      ResultCollector.open({score:sc, correct:ok, total:tot,
+        wrong:wrong.map((_,i)=>i+1), durationSec:0,
+        detail:title+(rk?` · ${rk.tierAfter.full} ${rk.after}RP`:'')});
+    };
+  }
   foot(`<button class="btn ghost" id="rr">🔁 다시</button><button class="btn" onclick="goHome()">🏠 홈으로</button>`);
   $('rr').onclick=retry;
   // 승급 연출
@@ -749,11 +760,6 @@ function gameResult(title, ok, tot, wrong, retry, score){
     FX.banner({icon:rk.tierAfter.icon,title:`${rk.tierAfter.name} 승급!`,
       sub:`${rk.after} RP · ${title}`,stars:3,btn:'좋아',onClose:()=>{}});
   else if(rk&&rk.promoted&&window.FX&&FX.burst) FX.burst({type:'ok'});
-  // 결과 제출 위젯 (?rc= 로 열었을 때만) — 계급도 함께 보냅니다
-  if(window.Collector&&Collector.mount){
-    try{ Collector.mount($('rcbox'),{score:sc,total:tot,correct:ok,
-      detail:title+(rk?` · ${rk.tierAfter.full} ${rk.after}RP`:'')}); }catch(e){}
-  }
 }
 
 /* ═══════ 계급표 · 기록 ═══════ */
