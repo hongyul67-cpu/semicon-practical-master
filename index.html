@@ -1,0 +1,810 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>반도체설비보전 실기 마스터</title>
+<!-- 결과 제출 위젯: ?rc=<교사 Apps Script exec> 링크로 열 때만 제출 버튼이 나타납니다 -->
+<script src="https://hongyul67-cpu.github.io/links/collector.js" data-tool="반도체설비보전 실기 마스터"></script>
+<script src="https://hongyul67-cpu.github.io/links/fx.js"></script>
+<script src="https://hongyul67-cpu.github.io/links/class-mode.js"></script>
+<!-- 계급(아이언~마스터) · 랭크 포인트 -->
+<script src="https://hongyul67-cpu.github.io/links/rank.js" data-tool="반도체설비보전 실기"></script>
+<script src="silgi.js"></script>
+<style>
+:root{
+  --bg:#0c1017; --panel:#161c27; --panel2:#1e2634; --line:#2c3648;
+  --ink:#e9eefa; --dim:#98a5bd; --dim2:#65708a;
+  --si:#7cc6ff; --si2:#3b9bff; --steel:#c9d6e6;
+  --air:#57e0c8;
+  --good:#3ad995; --bad:#ff5f6d; --gold:#ffd166; --warn:#ffa53b;
+  --r:16px; --sh:0 10px 30px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{font-family:"Malgun Gothic","맑은 고딕",system-ui,-apple-system,sans-serif;
+  background:radial-gradient(1200px 700px at 50% -180px,#16202f 0%,var(--bg) 62%);
+  color:var(--ink);min-height:100vh;font-size:15px;line-height:1.65}
+.wrap{max-width:760px;margin:0 auto;padding:0 13px 120px}
+.topbar{position:sticky;top:0;z-index:40;background:rgba(12,16,23,.93);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.topin{max-width:760px;margin:0 auto;padding:9px 13px;display:flex;align-items:center;gap:9px}
+.brand{font-weight:900;font-size:15px;letter-spacing:-.3px}
+.brand small{display:block;font-weight:600;font-size:11px;color:var(--dim2);letter-spacing:0}
+.tbtn{margin-left:auto;background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+  border-radius:10px;padding:7px 11px;font-size:12.5px;font-weight:700;cursor:pointer}
+.tbtn:hover{border-color:var(--si)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+  padding:16px 15px;margin:13px 0;box-shadow:var(--sh)}
+h1{font-size:22px;font-weight:900;margin:16px 0 4px;letter-spacing:-.5px}
+h1 span{color:var(--si)}
+.sub{color:var(--dim);font-size:13.5px;margin-bottom:4px}
+.pill{display:inline-block;background:var(--panel2);border:1px solid var(--line);
+  border-radius:999px;padding:3px 10px;font-size:11.5px;font-weight:700;color:var(--si)}
+.big{display:block;width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);
+  color:var(--ink);border-radius:14px;padding:14px;margin:9px 0;cursor:pointer;transition:.13s}
+.big:hover{border-color:var(--si);transform:translateY(-1px)}
+.big b{display:block;font-size:16px;font-weight:800;margin-bottom:2px}
+.big i{font-style:normal;color:var(--dim);font-size:12.5px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+.btn{background:linear-gradient(180deg,var(--si2),#2a7fd6);border:0;color:#04121f;
+  border-radius:12px;padding:12px 16px;font-size:14.5px;font-weight:900;cursor:pointer}
+.btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line)}
+.btn:disabled{opacity:.42;filter:grayscale(.6);cursor:default}
+.foot{position:fixed;left:0;right:0;bottom:0;z-index:35;background:rgba(12,16,23,.95);
+  backdrop-filter:blur(8px);border-top:1px solid var(--line)}
+.footin{max-width:760px;margin:0 auto;padding:10px 13px;display:flex;gap:9px}
+.footin .btn{flex:1}
+.hi{color:var(--si)}
+ul{margin:8px 0;padding-left:19px}li{margin:5px 0}
+.tipbox{margin-top:11px;background:#101a26;border:1px solid var(--line);border-left:3px solid var(--gold);
+  border-radius:10px;padding:10px 12px;font-size:13.5px;color:#dbe7f7}
+.warnbox{margin-top:11px;background:#20131a;border:1px solid #4a2733;border-left:3px solid var(--bad);
+  border-radius:10px;padding:10px 12px;font-size:13.5px}
+.exp{margin-top:10px;background:#101a26;border:1px solid var(--line);border-radius:10px;
+  padding:11px 12px;font-size:13.5px;line-height:1.7}
+/* 문항 */
+.qtext{font-size:16px;font-weight:800;line-height:1.55;margin-bottom:12px}
+.opt{display:block;width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);
+  color:var(--ink);border-radius:12px;padding:11px 13px;margin:7px 0;cursor:pointer;font-size:14.5px;transition:.12s}
+.opt:hover{border-color:var(--si)}
+.opt.ok{background:rgba(58,217,149,.14);border-color:var(--good)}
+.opt.no{background:rgba(255,95,109,.14);border-color:var(--bad)}
+.opt.dim{opacity:.45}
+/* 도면·도해 */
+.fig{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;margin:10px 0}
+.fig img{display:block;width:100%;height:auto;border-radius:6px}
+.figcap{font-size:12.5px;color:var(--dim);text-align:center;margin-top:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0}
+.chip{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:6px 10px;
+  font-size:13px;font-weight:700;cursor:pointer}
+.chip:hover{border-color:var(--si)}
+.chip.on{background:rgba(124,198,255,.16);border-color:var(--si);color:var(--si)}
+table{width:100%;border-collapse:collapse;margin:9px 0;font-size:13.5px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left}
+th{background:var(--panel2);font-weight:800;color:var(--si)}
+.dots{display:flex;gap:5px;justify-content:center;margin:12px 0 2px}
+.dot{width:7px;height:7px;border-radius:99px;background:var(--line)}
+.dot.on{background:var(--si)}
+.score{font-size:13px;color:var(--dim);text-align:right}
+/* 시뮬레이터 */
+.simwrap{background:#0e1723;border:1px solid var(--line);border-radius:14px;padding:14px 12px;margin:10px 0}
+.cyl{display:flex;align-items:center;gap:9px;margin:11px 0}
+.cyl .nm{width:58px;font-size:12.5px;font-weight:800;color:var(--dim)}
+.track{position:relative;flex:1;height:26px;background:#0a1119;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.rod{position:absolute;top:5px;left:4px;height:14px;width:22px;background:linear-gradient(180deg,#dbe7f7,#93a6c2);
+  border-radius:4px;transition:transform .55s cubic-bezier(.4,.1,.3,1)}
+.track.ext .rod{transform:translateX(calc(100% * 0 + var(--go,150px)))}
+.lamps{display:flex;gap:12px;justify-content:center;margin:14px 0 4px}
+.lamp{width:40px;height:40px;border-radius:99px;border:2px solid var(--line);background:#0a1119;
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--dim2);transition:.15s}
+.lamp.on.G{background:#3ad995;border-color:#7dffc4;color:#04231a;box-shadow:0 0 18px #3ad99588}
+.lamp.on.Y{background:#ffd166;border-color:#ffe6a8;color:#241c00;box-shadow:0 0 18px #ffd16688}
+.lamp.on.R{background:#ff5f6d;border-color:#ffb0b6;color:#2a0409;box-shadow:0 0 18px #ff5f6d88}
+.steplog{font-size:12.5px;color:var(--dim);min-height:20px;text-align:center;margin-top:8px}
+/* 순서 게임 */
+.slot{min-height:44px;border:1.5px dashed var(--line);border-radius:11px;padding:7px 9px;margin:6px 0;
+  font-size:13.5px;display:flex;align-items:center;gap:8px;color:var(--dim2)}
+.slot.filled{border-style:solid;background:var(--panel2);color:var(--ink)}
+.slot.ok{border-color:var(--good);background:rgba(58,217,149,.12)}
+.slot.no{border-color:var(--bad);background:rgba(255,95,109,.12)}
+.slot .no-{color:var(--si);font-weight:800;min-width:18px}
+.bar{height:7px;background:var(--panel2);border:1px solid var(--line);border-radius:99px;overflow:hidden;margin:10px 0}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--si2),var(--air));width:0;transition:width .3s}
+.muted{color:var(--dim2);font-size:12px}
+.rowbtn{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.rowbtn .btn{flex:1;min-width:120px;padding:10px 12px;font-size:13.5px}
+</style>
+
+<div class="topbar"><div class="topin">
+  <div class="brand">반도체설비보전 <span style="color:var(--air)">실기</span> 마스터
+    <small>조립작업 1시간 · 제어작업 2시간 · 공개문제 기준</small></div>
+  <button class="tbtn" id="btnHome">🏠 홈</button>
+</div></div>
+
+<div class="wrap">
+  <div id="sc"></div>
+</div>
+<div class="foot" id="foot" style="display:none"><div class="footin" id="footin"></div></div>
+
+<script>
+/* ═══════ 공통 ═══════ */
+const $=id=>document.getElementById(id);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;};
+const store={k:'sbs_v1',get(){try{return JSON.parse(localStorage.getItem(this.k))||{}}catch(e){return{}}},
+  set(f,v){const o=this.get();o[f]=v;try{localStorage.setItem(this.k,JSON.stringify(o))}catch(e){}}};
+let best=store.get().best||{}, learned=store.get().learned||{};
+function foot(html){ // 숨길 때 내용도 비운다 (이전 화면의 버튼이 DOM에 남지 않도록)
+  if(!html){$('foot').style.display='none';$('footin').innerHTML='';return;}
+  $('foot').style.display='';$('footin').innerHTML=html; }
+function fxOK(){ if(window.FX&&FX.burst)FX.burst({type:'ok'}); }
+function fxNO(){ if(window.FX&&FX.shake)FX.shake(); }
+
+/* ═══════ 배우기 ═══════ */
+const LESSON=[
+{id:'a',icon:'🔧',title:'조립작업 — 배관 제작',sub:'[시험 1] 1시간',cards:[
+ {h:'무엇을 시키는가',lead:'도면대로 굽히고, 새지 않게 조인다',
+  body:`<b class="hi">1/4인치 스테인리스 튜브 800 mm 한 개</b>를 도면대로 굽히고 잘라, 밸브·압력계·엘보에 연결하는 시험입니다.
+  <ul>
+   <li>다 만들면 감독위원 앞에서 <b class="hi">질소가스를 0.5 MPa</b>로 넣습니다</li>
+   <li>초기 게이지 값을 확인받고 → <b class="hi">5분 뒤</b> 다시 확인받습니다</li>
+   <li>5분 사이 압력이 떨어지면 = <b>누설</b> = <b class="hi">실격</b></li>
+   <li>답안지에 <b>초기 값 / 5분 후 / 압력 단위</b>를 적습니다 (단위는 시험장 게이지 기준)</li>
+  </ul>`,
+  tip:'시간은 1시간입니다. 굽히는 데 다 쓰면 조이다가 끝납니다. <b>굽힘 30분 · 체결 15분 · 검사 15분</b>으로 배분해 두세요.'},
+ {h:'지급재료 — 이것만 쓴다',lead:'재료 교환 없음, 다른 재료 쓰면 실격',
+  body:`<table><tr><th>재료명</th><th>규격</th><th>수량</th></tr>
+  <tr><td>stainless steel tube</td><td>BA Grade 1/4′</td><td>800 mm × 1</td></tr>
+  <tr><td>nut</td><td>1/4′</td><td>4</td></tr>
+  <tr><td>union elbow</td><td>1/4′</td><td>1</td></tr>
+  <tr><td>ferrule set (front)</td><td>1/4′</td><td>4</td></tr>
+  <tr><td>ferrule set (back)</td><td>1/4′</td><td>4</td></tr>
+  <tr><td>질소 가스(N₂)</td><td>20 L 병</td><td>15인 공용</td></tr></table>
+  <ul>
+   <li><b class="hi">BA Grade</b> = Bright Annealed. 내부를 광휘소둔해 매끈하게 만든 <b>초청정 배관용</b> 튜브입니다. 가스가 지나는 안쪽에 이물질이 붙지 않아야 하므로 반도체 라인은 전부 이걸 씁니다</li>
+   <li>너트 4 · 페럴 4세트 = <b>체결부가 4곳</b>이라는 뜻입니다</li>
+   <li>엘보 1개 = 도면의 <b class="hi">(A) 지점</b>에 쓰는 90° 유니온 엘보</li>
+  </ul>`,
+  tip:'튜브는 <b>800 mm 딱 한 개</b>뿐입니다. 잘못 굽히면 되돌릴 방법이 없으니 <b>굽히기 전에 치수를 두 번 재세요.</b>'},
+ {h:'튜브 피팅 — 1¼바퀴가 전부',lead:'페럴이 튜브를 물어 밀봉한다',
+  body:`너트를 조이면 <b class="hi">앞 페럴(front ferrule)</b>이 피팅 몸체의 경사면에 밀려 들어가 튜브 바깥면을 파고들며 <b>밀봉</b>하고,
+  <b class="hi">뒤 페럴(back ferrule)</b>이 튜브를 <b>붙잡아</b> 빠지지 않게 합니다.
+  <ul>
+   <li>순서: <b class="hi">너트 → 뒤 페럴 → 앞 페럴</b> 을 튜브에 끼운다 (방향 주의)</li>
+   <li>튜브를 피팅 몸체 <b>바닥에 닿을 때까지</b> 끝까지 밀어 넣는다</li>
+   <li>손으로 조인다(손조임) → 여기서부터 <b class="hi">1¼바퀴(1과 1/4 회전)</b> 더 조인다</li>
+   <li>표시를 위해 손조임 상태에서 너트에 <b>매직으로 선</b>을 긋고 돌리면 정확합니다</li>
+  </ul>`,
+  warn:'덜 조이면 <b>샙니다</b>. 너무 조이면 튜브가 눌려 <b>변형·균열</b>이 생깁니다. 둘 다 실격으로 가는 길입니다.'},
+ {h:'절단과 벤딩',lead:'버(burr)를 남기지 마라',
+  body:`<ul>
+   <li><b class="hi">절단</b> — 튜브 커터로 조금씩 돌려가며 자릅니다. 톱으로 자르면 단면이 찌그러져 페럴이 물지 못합니다</li>
+   <li><b class="hi">버 제거(디버링)</b> — 자른 안쪽 턱을 반드시 제거합니다. 남으면 가스 흐름을 방해하고 파티클이 됩니다</li>
+   <li><b class="hi">벤딩</b> — 벤더로 굽힙니다. 도면 주기: <b>지시 없는 라운드는 R15, 굽힘 각도는 90°</b></li>
+   <li>굽힘 반경이 너무 작으면 안쪽이 주름지고(kink) 바깥이 얇아집니다</li>
+   <li>치수 기준점은 도면의 <b class="hi">"너트 끝"</b> 표시입니다. 튜브 끝이 아닙니다</li>
+  </ul>`,
+  tip:'벤딩은 <b>스프링백</b>(굽혔다 놓으면 조금 되돌아옴)이 있습니다. 90°를 만들려면 조금 더 굽혔다 놓아야 합니다.'},
+ {h:'도면 읽는 법',lead:'정면도·측면도·등각도 세 장이 한 세트',
+  body:`공개도면은 항상 같은 구성입니다.
+  <ul>
+   <li><b class="hi">3D 등각도</b> — 완성된 모양. 밸브·압력계·가스통의 위치와 <b>정면 방향 화살표</b>가 있습니다</li>
+   <li><b class="hi">2D 정면도</b> — 정면 화살표에서 본 모습. 좌우·상하 치수</li>
+   <li><b class="hi">2D 측면도</b> — 옆에서 본 모습. 앞뒤·상하 치수</li>
+   <li><b class="hi">(A)</b> = 90° 엘보로 연결하는 지점. 두 도면 모두에 표시됩니다</li>
+   <li><b>P</b> 기호가 붙은 동그라미 = 압력계, 그 옆 나비 모양 = 밸브</li>
+  </ul>
+  정면도와 측면도의 치수를 <b>합치면 3차원 형상</b>이 나옵니다. 등각도는 그 형상이 맞는지 확인하는 용도로 보세요.`,
+  tip:'같은 100이라도 정면도의 100과 측면도의 100은 <b>서로 다른 방향</b>입니다. 어느 축인지 먼저 정하고 읽으세요.'},
+ {h:'누설검사와 실격',lead:'0.5 MPa · 5분',
+  body:`<ul>
+   <li>질소를 <b class="hi">0.5 MPa</b>까지 넣고 메인밸브를 잠근 뒤 <b class="hi">5분</b> 유지</li>
+   <li>게이지가 떨어지면 어딘가 샙니다 — 대개 <b>덜 조인 너트</b>나 <b>끝까지 안 들어간 튜브</b></li>
+   <li>실격 사유 중 치수·각도 항목을 꼭 외우세요:
+     <br>· 각도 오차 <b class="hi">20° 이상</b> → 실격
+     <br>· 치수 오차 <b class="hi">10 mm 이상</b> → 실격</li>
+   <li>두 과제(조립·제어) 중 <b>하나라도 0점</b>이면 전체 실격입니다</li>
+  </ul>`,
+  warn:'가스 누설은 <b>무조건 실격</b>입니다. 다 만들고 나서 조임을 한 번 더 확인할 시간을 남겨 두세요.'}
+]},
+{id:'c',icon:'⚙️',title:'제어작업 — PLC와 공압',sub:'[시험 2] 2시간',cards:[
+ {h:'무엇을 시키는가',lead:'하드웨어를 짜고 PLC 프로그램을 쓴다',
+  body:`실린더 3개와 램프 3개(녹색·황색·적색)를 <b class="hi">PLC로 제어</b>하는 시험입니다. 과제는 12세트 중 하나가 나옵니다.
+  <ul>
+   <li><b class="hi">스위치 1</b> → 테스트 동작 (문제에 표로 주어짐)</li>
+   <li><b class="hi">스위치 2</b> → 단속동작 (변위단계선도 <b>1사이클</b>)</li>
+   <li><b class="hi">스위치 3</b> → 연속동작 (같은 선도를 <b>3~5사이클</b>)</li>
+   <li><b>부가조건 1</b> — 단속/연속 중 램프 조건</li>
+   <li><b>부가조건 2</b> — 비상정지 동작</li>
+  </ul>`,
+  tip:'<b>모든 동작은 하나의 프로그램</b>에 넣어야 하고, <b>리셋하지 않아도 재동작</b>이 되어야 합니다. 이 두 줄이 채점의 큰 축입니다.'},
+ {h:'하드웨어 구성 규칙',lead:'점수는 여기서 조용히 깎인다',
+  body:`<ul>
+   <li>공기압 조정 유닛 공급 압력 <b class="hi">0.4 MPa ± 0.05 MPa</b></li>
+   <li>공기압 회로도대로 배관하고, <b>실린더 속도를 조절할 수 있게</b> 구성
+     <br>단, <b class="hi">실린더 부착형 속도제어밸브는 사용 불가</b> → 별도 <b>체크밸브 붙이 유량조절밸브</b>를 밸브 쪽에 답니다</li>
+   <li>정전 용량형 센서는 반드시 <b class="hi">센서 → 단자대 → PLC</b> 순서 (+, −, signal)</li>
+   <li>공기압 배관과 전기 배선은 <b>따로 묶어</b> 케이블 타이로 정리</li>
+   <li>케이블 타이 끝은 <b class="hi">1 mm 이내</b>로 절단</li>
+   <li>프로파일 위에 전선 조각 등 <b>이물질이 남으면 감점</b></li>
+  </ul>`,
+  warn:'“배치도에 없는 부품(솔레노이드 밸브, 유량조절밸브 등)은 임의 배치”지만, <b>간섭이 생기면 감점</b>입니다. 실린더 로드가 나오는 앞쪽은 반드시 비워 두세요.'},
+ {h:'공기압 회로 읽기',lead:'회로도 한 장이면 배관이 끝난다',
+  body:`공개문제의 회로도는 실린더마다 아래 세 덩어리가 반복됩니다.
+  <ul>
+   <li><b class="hi">복동 실린더</b> — 양쪽에 공기가 들어가 나갈 때·들어올 때 모두 힘을 씁니다</li>
+   <li><b class="hi">체크밸브 붙이 유량조절밸브 2개</b> — 배기 쪽 유량을 조여 속도를 잡는 <b>미터 아웃</b> 방식입니다. 공압에서 속도 제어는 거의 미터 아웃입니다</li>
+   <li><b class="hi">5포트 2위치 방향제어밸브</b> — 아래쪽 큰 사각형 두 칸짜리. 화살표가 그려진 쪽이 통하는 길입니다
+     <br>· 양쪽 다 사각형(솔레노이드) = <b>양솔(더블 솔레노이드)</b> — 신호를 끊어도 그 자리를 유지
+     <br>· 한쪽만 솔레노이드 + 반대쪽 스프링(∿) = <b>편솔(싱글 솔레노이드)</b> — 신호를 끊으면 스프링이 되돌림</li>
+  </ul>
+  회로도에서 실린더3만 스프링 기호가 붙어 있으면, 실린더3은 <b>편솔</b>입니다. 비상정지 때 “후진상태 유지”가 자동으로 되는 쪽이죠.`,
+  tip:'미터 인(공급 조임)은 저압에서 <b>덜컥거림(스틱슬립)</b>이 생깁니다. 그래서 공압은 <b>미터 아웃</b>이 기본입니다.'},
+ {h:'실린더 동작상태 용어',lead:'문제의 말뜻을 정확히 새겨야 한다',
+  body:`<table><tr><th>용어</th><th>뜻</th></tr>
+  <tr><td><b>전진 중</b></td><td>전진 시작부터 전진완료까지</td></tr>
+  <tr><td><b>전진완료</b></td><td>전진완료 상태(멈춰 있음)</td></tr>
+  <tr><td><b>후진 중</b></td><td>후진 시작부터 후진완료까지</td></tr>
+  <tr><td><b>후진완료</b></td><td>후진완료 상태(멈춰 있음)</td></tr>
+  <tr><td><b>동작 중</b></td><td>전진 시작 ~ 후진완료, 후진 시작 ~ 전진완료</td></tr></table>
+  <ul>
+   <li>“실린더1 <b class="hi">전진 중</b> 녹색램프” = 나가는 동안만 켜짐. 다 나가면 꺼집니다</li>
+   <li>“실린더1 <b class="hi">동작 중</b> 녹색램프” = 나갈 때도 들어올 때도 켜짐</li>
+   <li>이 차이 하나로 채점이 갈립니다. 표를 반드시 다시 읽으세요</li>
+  </ul>`,
+  tip:'“전진 중”은 <b>리밋스위치가 붙기 전까지</b>, “전진완료”는 <b>리밋스위치가 붙은 뒤</b>로 프로그램하면 정확합니다.'},
+ {h:'변위단계선도 읽기',lead:'가로는 단계, 세로는 상태',
+  body:`<ul>
+   <li>가로축의 <b>1 2 3 … 8=1</b> = <b class="hi">단계(step)</b>. 마지막이 처음으로 돌아온다는 뜻(1사이클)</li>
+   <li>세로축 <b>0 / 1</b> = 실린더는 <b>0=후진완료, 1=전진완료</b>, 램프는 <b>0=소등, 1=점등</b></li>
+   <li>선이 <b>비스듬히 올라가는 구간</b> = 실린더가 움직이는 중(전진 중)</li>
+   <li>선이 <b>평평한 구간</b> = 그 상태로 멈춰 있음</li>
+   <li>램프는 계단처럼 각지게 그려집니다. <b>빗금(해칭)</b>이 쳐진 구간은 <b class="hi">점멸</b>을 뜻합니다</li>
+   <li><b>3초</b> 같은 숫자가 붙은 구간 = <b>타이머</b>로 잡아야 하는 시간</li>
+  </ul>
+  선도를 먼저 <b>말로 바꿔</b> 적어 보세요. “1단계: 실린더1 전진 … 3단계: 실린더2 전진 …” 이렇게 적고 나면 래더는 그대로 옮기면 됩니다.`,
+  tip:'단계 수 = 밸브를 몇 번 바꾸는가입니다. <b>스텝 제어(순차 제어)</b>로 짜면 사이클 반복과 비상정지 처리가 훨씬 쉬워집니다.'},
+ {h:'채점에서 놓치기 쉬운 것',lead:'부가조건은 연속동작이 돌아야 본다',
+  body:`<ul>
+   <li><b class="hi">부가조건 1·2는 연속동작이 정상동작해야 채점</b>합니다. 연속이 안 되면 부가조건은 다 날아갑니다 → <b>연속동작을 먼저 완성</b>하세요</li>
+   <li>비상정지 해제 후 동작이 세트마다 다릅니다
+     <br>· 대부분: <b>모든 시스템 초기화</b>
+     <br>· 11·12세트: <b class="hi">정지된 이후의 남은 동작을 이어서 수행</b> ← 완전히 다른 프로그램입니다</li>
+   <li>점멸은 대부분 <b class="hi">1초 ON / 1초 OFF</b>입니다. 타이머 2개로 자기유지하며 반복시킵니다</li>
+   <li>리셋 없이 재동작 = 사이클이 끝나면 <b>내부 스텝 릴레이를 스스로 초기화</b>해야 합니다</li>
+  </ul>`,
+  warn:'제어작업 배점이 크지만, <b>조립작업이 0점이면 함께 실격</b>입니다. 두 과제 모두 완성하는 게 먼저입니다.'}
+]}];
+
+/* ═══════ 홈 ═══════ */
+function goHome(){
+  foot('');
+  const done=Object.keys(learned).length, tot=LESSON.reduce((a,c)=>a+c.cards.length,0);
+  $('sc').innerHTML=`
+  <h1>반도체설비보전 <span>실기</span> 준비</h1>
+  <div class="sub">작업형 3시간 30분 — 조립작업 1시간 + 제어작업 2시간. 두 과제 중 하나라도 0점이면 실격입니다.</div>
+
+  <div class="card" style="padding:13px">
+    ${window.Rank?Rank.card():''}
+    <div class="rowbtn" style="margin-top:11px">
+      <button class="btn ghost" onclick="openRank()" style="flex:1">🏆 계급표 · 기록</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="pill">공개문제 그대로</div>
+    <p style="margin:9px 0 4px">Q-Net에 공개된 <b class="hi">조립 도면 12종</b>과 <b class="hi">제어 과제 12세트</b>를 전부 담았습니다.
+    실제 시험은 이 중에서 나옵니다.</p>
+    <div class="bar"><i style="width:${Math.round(done/2*100)}%"></i></div>
+    <div class="muted">배우기 진행 ${done} / 2단원</div>
+  </div>
+
+  <button class="big" onclick="openLesson(0)"><b>📘 배우기 — 조립작업</b><i>재료·피팅 체결·벤딩·도면 읽기·누설검사 · 6쪽</i></button>
+  <button class="big" onclick="openLesson(1)"><b>📗 배우기 — 제어작업</b><i>하드웨어 규칙·공압회로·동작용어·변위단계선도 · 6쪽</i></button>
+
+  <div class="grid2">
+    <button class="big" onclick="openAsm(0)"><b>📐 조립 도면 12장</b><i>공개도면 전체 · 치수표 함께 보기</i></button>
+    <button class="big" onclick="startAsmGame()"><b>🎯 도면 치수 읽기</b><i>도면 보고 치수 맞히기 · 12문항</i></button>
+    <button class="big" onclick="openCtl(0)"><b>⚙️ 제어 과제 12세트</b><i>배치도·회로도·선도·부가조건 전체</i></button>
+    <button class="big" onclick="openSim(0)"><b>🕹️ 동작 시뮬레이터</b><i>테스트동작을 눈으로 확인</i></button>
+    <button class="big" onclick="startOrder()"><b>🧩 동작 순서 맞추기</b><i>제어요소 순서를 세우는 게임</i></button>
+    <button class="big" onclick="startFail()"><b>🚫 실격조건 O·X</b><i>떨어지는 조건만 골라내기</i></button>
+  </div>
+
+  <button class="big" onclick="startCbt()" style="border-color:var(--air)">
+    <b>✅ 실기 점검 20문항</b><i>조립·제어 전 범위 · 100점 환산 · 결과 제출 가능</i>
+    ${best.cbt?`<i style="color:var(--gold)">최고 ${best.cbt}점</i>`:''}</button>
+
+  <div class="card" style="font-size:12.5px;color:var(--dim)">
+    <b class="hi">자료 출처</b> — 한국산업인력공단 Q-Net 「반도체설비보전기능사 공개문제」(2023-12-15 등록)
+    시험1 반도체설비 조립작업 / 시험2 반도체설비 제어작업.
+    도면과 도해는 원본을 그대로 옮겼고, 설명·문항은 공개문제 내용을 바탕으로 직접 작성했습니다.
+    <br><b class="hi">주의</b> — 공개문제는 “일부 요구사항 등이 변경될 수 있음”으로 안내됩니다. 시험 전 Q-Net에서 최신본을 확인하세요.
+  </div>`;
+}
+
+/* ═══════ 배우기 ═══════ */
+let lc={ci:0,pi:0};
+function openLesson(ci){ lc={ci,pi:0}; renderLesson(); }
+function renderLesson(){
+  const ch=LESSON[lc.ci], card=ch.cards[lc.pi];
+  $('sc').innerHTML=`<div class="card" id="lcard">
+    <div class="pill">${ch.icon} ${ch.title} · ${lc.pi+1}/${ch.cards.length}쪽</div>
+    <h1 style="font-size:19px;margin:10px 0 3px">${card.h}</h1>
+    <div style="color:var(--si);font-weight:700;font-size:13.5px;margin-bottom:9px">${card.lead}</div>
+    <div>${card.body}</div>
+    ${card.tip?`<div class="tipbox">💡 ${card.tip}</div>`:''}
+    ${card.warn?`<div class="warnbox">⚠️ ${card.warn}</div>`:''}
+    <div class="dots">${ch.cards.map((_,i)=>`<div class="dot ${i<=lc.pi?'on':''}"></div>`).join('')}</div>
+  </div>`;
+  const last=lc.pi===ch.cards.length-1;
+  foot(`<button class="btn ghost" id="lp" ${lc.pi===0?'disabled':''}>← 이전</button>
+        <button class="btn" id="ln">${last?'✅ 이 단원 끝내기':'다음 →'}</button>`);
+  $('lp').onclick=()=>{if(lc.pi>0){lc.pi--;renderLesson();}};
+  $('ln').onclick=()=>{
+    if(!last){lc.pi++;renderLesson();return;}
+    learned[LESSON[lc.ci].id]=true; store.set('learned',learned);
+    if(window.FX)FX.banner({icon:'🎓',title:`${ch.title} 완료!`,sub:'이제 도면과 과제를 직접 보세요',stars:3,btn:'확인',onClose:goHome});
+    else goHome();
+  };
+}
+
+/* ═══════ 조립 도면 뷰어 ═══════ */
+let asmI=0;
+function openAsm(i){ asmI=i; renderAsm(); }
+function renderAsm(){
+  const d=ASM[asmI];
+  $('sc').innerHTML=`
+  <h1 style="font-size:20px">📐 조립 도면 <span>${d.n}번</span></h1>
+  <div class="sub">공개도면 12종 · 실제 시험은 이 중 한 장이 나옵니다</div>
+  <div class="chips">${ASM.map((x,i)=>`<div class="chip ${i===asmI?'on':''}" onclick="openAsm(${i})">${x.n}</div>`).join('')}</div>
+  <div class="fig"><img src="img/asm-${String(d.n).padStart(2,'0')}.png" alt="조립 도면 ${d.n}"></div>
+  <div class="card">
+    <div class="pill">치수 정리</div>
+    <table>
+      <tr><th>2D 정면도</th><td>${d.f.join(' → ')} <span class="muted">(mm)</span></td></tr>
+      <tr><th>2D 측면도</th><td>${d.s.join(' → ')} <span class="muted">(mm)</span></td></tr>
+      <tr><th>치수 합</th><td>정면 ${d.f.reduce((a,b)=>a+b,0)} + 측면 ${d.s.reduce((a,b)=>a+b,0)}
+        = <b class="hi">${d.f.reduce((a,b)=>a+b,0)+d.s.reduce((a,b)=>a+b,0)} mm</b></td></tr>
+      <tr><th>굽힘 수</th><td>정면 ${d.f.length-1}곳 · 측면 ${d.s.length-1}곳</td></tr>
+    </table>
+    <div class="tipbox">💡 주기 — 지시 없는 라운드는 <b>R15</b>, Bending 각도는 <b>90°</b>.
+      <b>(A) 지점</b>은 <b>90° ELBOW</b>로 연결합니다.</div>
+    <div class="warnbox">⚠️ 치수 오차 <b>10 mm 이상</b>, 각도 오차 <b>20° 이상</b>이면 실격입니다.</div>
+  </div>`;
+  foot(`<button class="btn ghost" onclick="openAsm(${(asmI+11)%12})">← 이전 도면</button>
+        <button class="btn" onclick="openAsm(${(asmI+1)%12})">다음 도면 →</button>`);
+}
+
+/* ═══════ 도면 치수 게임 ═══════ */
+let ag=null;
+function startAsmGame(){
+  const qs=shuffle(ASM).map(d=>{
+    const view=Math.random()<.5?'f':'s';
+    const arr=d[view], kind=['max','sum','count','nth'][Math.random()*4|0];
+    const vname=view==='f'?'정면도':'측면도';
+    let q,ans;
+    if(kind==='max'){ q=`도면 ${d.n}의 2D ${vname}에서 <b>가장 큰 치수</b>는?`; ans=Math.max(...arr); }
+    else if(kind==='sum'){ q=`도면 ${d.n}의 2D ${vname}에 표시된 <b>치수를 모두 더하면</b>?`; ans=arr.reduce((a,b)=>a+b,0); }
+    else if(kind==='count'){ q=`도면 ${d.n}의 2D ${vname}에 표시된 <b>치수의 개수</b>는?`; ans=arr.length; }
+    else { const k=Math.random()*arr.length|0; q=`도면 ${d.n}의 2D ${vname}에서 <b>${k+1}번째 치수</b>는? <span class="muted">(밸브 쪽에서 (A) 쪽으로 읽는 순서)</span>`; ans=arr[k]; }
+    const opts=new Set([ans]);
+    while(opts.size<4){ const v = kind==='count' ? ans+((Math.random()*4|0)-2) : ans+([-50,-30,-20,-10,10,20,30,50][Math.random()*8|0]); if(v>0)opts.add(v); }
+    return {img:`img/asm-${String(d.n).padStart(2,'0')}.png`, q, o:shuffle([...opts]), a:ans, unit:kind==='count'?'개':'mm'};
+  });
+  ag={qs,i:0,ok:0,wrong:[]}; renderAsmGame();
+}
+function renderAsmGame(){
+  if(ag.i>=ag.qs.length) return gameResult('🎯 도면 치수 읽기', ag.ok, ag.qs.length, ag.wrong, startAsmGame);
+  const it=ag.qs[ag.i];
+  $('sc').innerHTML=`
+  <div class="card">
+    <div style="display:flex"><div class="pill">🎯 도면 치수 ${ag.i+1} / ${ag.qs.length}</div>
+      <div class="score" style="flex:1">맞은 개수 ${ag.ok}</div></div>
+    <div class="fig" style="margin-top:11px"><img src="${it.img}" alt="도면"></div>
+    <div class="qtext" style="margin-top:12px">${it.q}</div>
+    <div id="opts">${it.o.map((v,i)=>`<button class="opt" data-i="${i}">${v} ${it.unit}</button>`).join('')}</div>
+    <div id="exp"></div>
+  </div>`;
+  foot('');
+  $('opts').querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    const v=it.o[+b.dataset.i], ok=v===it.a;
+    $('opts').querySelectorAll('.opt').forEach((x,i)=>{x.onclick=null;
+      if(it.o[i]===it.a)x.classList.add('ok'); else if(i===+b.dataset.i)x.classList.add('no'); else x.classList.add('dim');});
+    if(ok){ag.ok++;fxOK();}else{ag.wrong.push(it.q.replace(/<[^>]+>/g,'')+` → 정답 ${it.a}${it.unit}`);fxNO();}
+    $('exp').innerHTML=`<div class="exp"><b>${ok?'정답':'정답은 '+it.a+it.unit}</b> · 도면 위 치수를 직접 짚어 보며 확인하세요.</div>`;
+    foot(`<button class="btn" id="nx">${ag.i===ag.qs.length-1?'결과 보기':'다음 →'}</button>`);
+    $('nx').onclick=()=>{ag.i++;renderAsmGame();};
+  });
+}
+
+/* ═══════ 제어 과제 뷰어 ═══════ */
+let ctlI=0;
+function openCtl(i){ ctlI=i; renderCtl(); }
+function renderCtl(){
+  const c=CTL[ctlI], id=String(c.n).padStart(2,'0');
+  $('sc').innerHTML=`
+  <h1 style="font-size:20px">⚙️ 제어 과제 <span>${c.n}세트</span></h1>
+  <div class="sub">공개문제 12세트 · 실제 시험은 이 중 하나가 나옵니다</div>
+  <div class="chips">${CTL.map((x,i)=>`<div class="chip ${i===ctlI?'on':''}" onclick="openCtl(${i})">${x.n}</div>`).join('')}</div>
+
+  <div class="card">
+    <div class="pill">스위치 1 · 테스트 동작</div>
+    <table style="margin-top:9px">
+      <tr><th>제어요소</th><td>${c.cyl}</td></tr>
+      <tr><th>동작</th><td><b class="hi">${c.act}</b></td></tr>
+      <tr><th>사용 램프</th><td>${c.lamp}</td></tr>
+      <tr><th>표시상태</th><td>${c.rule}</td></tr>
+    </table>
+    <div class="rowbtn"><button class="btn" onclick="openSim(${ctlI})">🕹️ 이 동작 시뮬레이터로 보기</button></div>
+  </div>
+
+  <div class="card">
+    <div class="pill">스위치 2 · 단속동작 — 변위단계선도 1사이클</div>
+    <div class="fig" style="margin-top:9px"><img src="img/ctl-${id}-chart.png" alt="변위단계선도"></div>
+    <div class="figcap">가로 = 단계(8=1은 1사이클 완료) · 세로 0/1 = 후진완료/전진완료, 소등/점등 · 빗금 = 점멸</div>
+  </div>
+
+  <div class="card">
+    <div class="pill">스위치 3 · 연속동작</div>
+    <p style="margin:9px 0 0">위 변위단계선도 동작을 <b class="hi">${c.cycle}사이클</b> 수행합니다.</p>
+    <div class="pill" style="margin-top:13px">부가조건 1</div>
+    <ul>${c.add1.map(x=>`<li>${x}</li>`).join('')}</ul>
+    <div class="pill">부가조건 2 — 비상정지</div>
+    <ul>${c.add2.map(x=>`<li>${x}</li>`).join('')}</ul>
+    <div class="tipbox">💡 부가조건 1·2는 <b>연속동작이 정상동작해야</b> 채점합니다.</div>
+  </div>
+
+  <div class="card">
+    <div class="pill">배치도</div>
+    <div class="fig" style="margin-top:9px"><img src="img/ctl-${id}-layout.png" alt="배치도"></div>
+    <div class="pill" style="margin-top:8px">공기압 회로도</div>
+    <div class="fig" style="margin-top:9px"><img src="img/ctl-${id}-pneu.png" alt="공기압 회로도"></div>
+    <div class="figcap">LS = 리밋스위치, S = 센서 · 표시되지 않은 부품(솔레노이드 밸브, 체크밸브 붙이 유량조절밸브)은 임의 배치</div>
+  </div>`;
+  foot(`<button class="btn ghost" onclick="openCtl(${(ctlI+11)%12})">← 이전 세트</button>
+        <button class="btn" onclick="openCtl(${(ctlI+1)%12})">다음 세트 →</button>`);
+}
+
+/* ═══════ 동작 시뮬레이터 ═══════ */
+let sim={i:0,timer:null,step:-1,blink:null};
+function openSim(i){ stopSim(); sim.i=i; sim.step=-1; renderSim(); }
+function stopSim(){ if(sim.timer){clearTimeout(sim.timer);sim.timer=null;} if(sim.blink){clearInterval(sim.blink);sim.blink=null;} }
+function renderSim(){
+  const c=CTL[sim.i], sp=CTL_STEPS[c.n];
+  $('sc').innerHTML=`
+  <h1 style="font-size:20px">🕹️ 동작 시뮬레이터 <span>${c.n}세트</span></h1>
+  <div class="sub">스위치 1 — 테스트 동작을 눈으로 확인합니다</div>
+  <div class="chips">${CTL.map((x,i)=>`<div class="chip ${i===sim.i?'on':''}" onclick="openSim(${i})">${x.n}</div>`).join('')}</div>
+  <div class="card">
+    <div class="pill">동작</div>
+    <p style="margin:8px 0 2px"><b class="hi">${c.act}</b></p>
+    <p class="muted" style="margin:0">${c.rule}</p>
+    <div class="simwrap">
+      <div class="lamps">
+        <div class="lamp G" id="lG">녹</div><div class="lamp Y" id="lY">황</div><div class="lamp R" id="lR">적</div>
+      </div>
+      ${[1,2,3].map(n=>`<div class="cyl"><div class="nm">실린더${n}</div>
+        <div class="track" id="tk${n}"><div class="rod" id="rd${n}"></div></div></div>`).join('')}
+      <div class="steplog" id="slog">▶ 시작을 누르세요</div>
+    </div>
+    <div class="rowbtn">
+      <button class="btn" id="simGo">▶ 스위치 1 (테스트 동작)</button>
+      <button class="btn ghost" id="simRst">↺ 초기화</button>
+    </div>
+    <div class="tipbox">💡 로드가 <b>움직이는 동안</b>이 “전진 중 / 후진 중”, <b>끝에서 멈춘 상태</b>가 “전진완료 / 후진완료”입니다.
+      램프 조건이 어느 쪽인지 표에서 꼭 확인하세요.</div>
+  </div>`;
+  foot(`<button class="btn ghost" onclick="openCtl(${sim.i})">📄 과제 전문 보기</button>
+        <button class="btn ghost" onclick="goHome()">🏠 홈으로</button>`);
+  resetSim();
+  $('simGo').onclick=runSim; $('simRst').onclick=()=>{stopSim();resetSim();$('slog').textContent='▶ 시작을 누르세요';};
+}
+function resetSim(){
+  const c=CTL[sim.i], sp=CTL_STEPS[c.n];
+  // 첫 동작이 후진인 실린더는 전진상태에서 시작
+  const startExt=new Set();
+  const seen=new Set();
+  sp.steps.forEach(s=>s.c.forEach(n=>{ if(!seen.has(n)){seen.add(n); if(s.d==='ret')startExt.add(n);} }));
+  [1,2,3].forEach(n=>setRod(n, startExt.has(n)));
+  ['G','Y','R'].forEach(L=>$('l'+L).classList.remove('on'));
+}
+function setRod(n,ext){
+  const tk=$('tk'+n); if(!tk)return;
+  const w=tk.clientWidth-32;
+  $('rd'+n).style.transform = ext?`translateX(${w}px)`:'translateX(0)';
+  tk.dataset.ext = ext?'1':'0';
+}
+function lampFor(sp, moving){ // moving = {c:[..], d:'ext'|'ret'}
+  const on=new Set();
+  if(!moving) return on;
+  sp.lamps.forEach(r=>{
+    const hit = r.c.some(n=>moving.c.includes(n));
+    if(!hit) return;
+    if(r.p==='any' || r.p===moving.d) on.add(r.L);
+  });
+  return on;
+}
+function runSim(){
+  stopSim(); resetSim();
+  const c=CTL[sim.i], sp=CTL_STEPS[c.n];
+  let k=0;
+  const go=()=>{
+    if(k>=sp.steps.length){
+      ['G','Y','R'].forEach(L=>$('l'+L).classList.remove('on'));
+      $('slog').innerHTML='✅ 테스트 동작 완료';
+      if(window.FX)FX.burst&&FX.burst({type:'ok'});
+      return;
+    }
+    const s=sp.steps[k];
+    const on=lampFor(sp,s);
+    ['G','Y','R'].forEach(L=>$('l'+L).classList.toggle('on',on.has(L)));
+    s.c.forEach(n=>setRod(n, s.d==='ext'));
+    const names={G:'녹색',Y:'황색',R:'적색'};
+    $('slog').innerHTML=`${k+1}단계 · 실린더${s.c.join('·')} <b class="hi">${s.d==='ext'?'전진':'후진'} 중</b>`
+      +(on.size?` · ${[...on].map(L=>names[L]).join('·')}램프 점등`:'');
+    k++; sim.timer=setTimeout(go,900);
+  };
+  go();
+}
+
+/* ═══════ 동작 순서 맞추기 ═══════ */
+let og=null;
+function startOrder(){
+  const set=CTL[Math.random()*CTL.length|0], sp=CTL_STEPS[set.n];
+  const items=sp.steps.map((s,i)=>({i,label:`실린더${s.c.join('·')} ${s.d==='ext'?'전진':'후진'}`}));
+  og={set,items,pool:shuffle(items),picked:[],first:new Set(),done:false};
+  renderOrder();
+}
+function renderOrder(){
+  const {set,items,pool,picked}=og;
+  $('sc').innerHTML=`
+  <div class="card">
+    <div class="pill">🧩 동작 순서 맞추기 · ${set.n}세트</div>
+    <div class="qtext" style="margin-top:11px">스위치 1을 눌렀을 때 <b class="hi">${set.cyl}</b>는 어떤 순서로 움직입니까?</div>
+    <div class="muted" style="margin-bottom:9px">아래 조각을 순서대로 누르세요. 한 번에 맞힌 자리만 점수가 됩니다.</div>
+    <div id="slots">${items.map((_,i)=>{
+      const p=picked[i];
+      return `<div class="slot ${p?'filled':''} ${p?(p.i===i?'ok':'no'):''}">
+        <span class="no-">${i+1}</span>${p?p.label:'&nbsp;'}</div>`;}).join('')}</div>
+    <div class="chips" id="pool" style="margin-top:12px">
+      ${pool.map((p,i)=>`<div class="chip" data-i="${i}">${p.label}</div>`).join('')}
+    </div>
+    <div id="oexp"></div>
+  </div>`;
+  foot(og.done?`<button class="btn ghost" onclick="startOrder()">🔁 다른 세트</button>
+        <button class="btn" onclick="goHome()">🏠 홈으로</button>`:'');
+  $('pool').querySelectorAll('.chip').forEach(el=>el.onclick=()=>{
+    if(og.done) return;
+    const p=og.pool.splice(+el.dataset.i,1)[0];
+    const pos=og.picked.length;
+    if(p.i===pos) og.first.add(pos); else fxNO();
+    og.picked.push(p);
+    if(og.picked.length===og.items.length){
+      og.done=true;
+      const n=og.first.size, tot=og.items.length, pct=Math.round(n/tot*100);
+      if(n===tot) fxOK();
+      let rk=null; if(window.Rank){ try{ rk=Rank.award(pct,{mode:'🧩 동작 순서 맞추기'}); }catch(e){} }
+      renderOrder();
+      $('oexp').innerHTML=`<div class="exp"><b>${n} / ${tot} 자리 정답 (${pct}점)</b><br>
+        정답 순서 — ${og.items.map((x,i)=>`${i+1}. ${x.label}`).join(' → ')}<br>
+        <span class="muted">문제 표기: ${set.act}</span></div>
+        ${rk?`<div class="card" style="margin-top:11px">${Rank.resultBox(rk)}</div>`:''}`;
+      if(rk&&rk.tierUp&&window.FX)FX.banner({icon:rk.tierAfter.icon,title:`${rk.tierAfter.name} 승급!`,sub:`${rk.after} RP`,stars:3,btn:'좋아',onClose:()=>{}});
+      else if(n===tot&&window.FX)FX.banner({icon:'🧩',title:'순서 완성!',sub:`${set.n}세트 테스트 동작`,stars:3,btn:'확인',onClose:()=>{}});
+    } else renderOrder();
+  });
+}
+
+/* ═══════ 실격조건 O·X ═══════ */
+let fg=null;
+function startFail(){ fg={qs:shuffle(ASM_FAIL).slice(0,10),i:0,ok:0,wrong:[]}; renderFail(); }
+function renderFail(){
+  if(fg.i>=fg.qs.length) return gameResult('🚫 실격조건 O·X', fg.ok, fg.qs.length, fg.wrong, startFail);
+  const [txt,isFail]=fg.qs[fg.i];
+  $('sc').innerHTML=`
+  <div class="card">
+    <div style="display:flex"><div class="pill">🚫 실격조건 ${fg.i+1} / ${fg.qs.length}</div>
+      <div class="score" style="flex:1">맞은 개수 ${fg.ok}</div></div>
+    <div class="qtext" style="margin-top:12px">${txt}</div>
+    <div class="muted" style="margin-bottom:9px">이것은 <b>실격(채점 제외)</b> 사유입니까?</div>
+    <button class="opt" id="oY">⭕ 실격이다</button>
+    <button class="opt" id="oN">❌ 실격이 아니다</button>
+    <div id="exp"></div>
+  </div>`;
+  foot('');
+  const pick=v=>{
+    const ok=v===isFail;
+    $('oY').classList.add(isFail?'ok':'no'); $('oN').classList.add(isFail?'no':'ok');
+    $('oY').onclick=$('oN').onclick=null;
+    if(ok){fg.ok++;fxOK();}else{fg.wrong.push(txt.replace(/<[^>]+>/g,'')+` → ${isFail?'실격 사유임':'실격 사유가 아님'}`);fxNO();}
+    $('exp').innerHTML=`<div class="exp"><b>${ok?'정답':'오답'}</b> · ${isFail
+      ?'공개문제 「수험자 유의사항」에 <b>실격</b>으로 명시된 항목입니다.'
+      :'실격 목록에 없는 항목입니다. 감점 요소일 수는 있어도 채점에서 제외되지는 않습니다.'}</div>`;
+    foot(`<button class="btn" id="nx">${fg.i===fg.qs.length-1?'결과 보기':'다음 →'}</button>`);
+    $('nx').onclick=()=>{fg.i++;renderFail();};
+  };
+  $('oY').onclick=()=>pick(true); $('oN').onclick=()=>pick(false);
+}
+
+/* ═══════ 점검 CBT ═══════ */
+const BANK=[
+ {q:'[시험 1] 조립작업의 시험시간은?',o:['1시간','30분','2시간','3시간 30분'],a:0,
+  e:'조립작업 <b>1시간</b> + 제어작업 <b>2시간</b>. 대기·준비를 포함한 전체가 3시간 30분 정도다.'},
+ {q:'조립작업에서 배관에 주입하는 가스와 압력은?',o:['질소(N₂) 0.5 MPa','공기 0.4 MPa','아르곤 0.5 MPa','질소(N₂) 0.05 MPa'],a:0,
+  e:'질소를 <b>0.5 MPa</b>로 넣고, 감독위원 확인 후 <b>5분</b> 뒤 게이지 값을 다시 확인받는다.'},
+ {q:'가스 주입 후 게이지 값을 다시 확인받는 시점은?',o:['5분 경과 후','1분 경과 후','10분 경과 후','즉시'],a:0,
+  e:'초기값 확인 → <b>5분 경과</b> → 재확인. 답안에는 초기값 / 5분 후 / 압력 단위를 적는다.'},
+ {q:'조립작업 지급재료로 맞는 것은?',o:["stainless steel tube BA Grade 1/4' 800 mm 1개","1/2' 튜브 1,000 mm 2개","동관 800 mm 1개","BA Grade 튜브 800 mm 2개"],a:0,
+  e:'튜브는 <b>1/4인치 BA Grade 800 mm 딱 1개</b>. 재료는 교환되지 않으므로 굽히기 전에 두 번 재야 한다.'},
+ {q:'조립작업에서 지급되는 너트와 페럴 세트의 수량은?',o:['너트 4, 페럴 세트 각 4','너트 2, 페럴 세트 각 2','너트 4, 페럴 세트 각 2','너트 6, 페럴 세트 각 6'],a:0,
+  e:'너트 4개, front 페럴 4개, back 페럴 4개 → <b>체결부가 4곳</b>이라는 뜻이다.'},
+ {q:'튜브 피팅에서 앞 페럴(front ferrule)의 역할은?',o:['튜브 바깥면을 파고들어 밀봉한다','튜브를 붙잡아 빠지지 않게 한다','너트의 풀림을 막는다','튜브 안쪽의 버를 제거한다'],a:0,
+  e:'<b>앞 페럴 = 밀봉</b>, <b>뒤 페럴(back ferrule) = 파지(붙잡기)</b>. 역할이 서로 다르다.'},
+ {q:'튜브 피팅을 손조임한 뒤 추가로 조이는 표준 회전량은?',o:['1¼바퀴','½바퀴','2½바퀴','4바퀴'],a:0,
+  e:'손조임 후 <b>1과 1/4 회전</b>이 표준이다. 손조임 위치에 매직으로 표시하고 돌리면 정확하다.'},
+ {q:'도면 주기에서 “지시 없는 라운드”와 “Bending 각도”는?',o:['R15 / 90°','R10 / 45°','R15 / 45°','R20 / 90°'],a:0,
+  e:'공개도면 12종 모두 주기가 같다 — <b>R15, 90°</b>. (A) 지점은 90° 엘보 연결.'},
+ {q:'도면의 (A) 지점이 뜻하는 것은?',o:['90° ELBOW로 연결하는 지점','압력계를 다는 지점','튜브를 자르는 지점','밸브를 다는 지점'],a:0,
+  e:'주기 2번에 명시되어 있다. 지급재료의 <b>union elbow 1개</b>가 여기에 쓰인다.'},
+ {q:'조립작업에서 <b>실격</b>이 되는 치수 오차 기준은?',o:['도면과 10 mm 이상 차이','도면과 3 mm 이상 차이','도면과 5 mm 이상 차이','도면과 20 mm 이상 차이'],a:0,
+  e:'치수는 <b>10 mm 이상</b>, 각도는 <b>20° 이상</b> 오차면 실격이다.'},
+ {q:'조립작업에서 <b>실격</b>이 되는 각도 오차 기준은?',o:['도면과 20° 이상 차이','도면과 5° 이상 차이','도면과 10° 이상 차이','도면과 45° 이상 차이'],a:0,
+  e:'각도 <b>20° 이상</b>. 치수(10 mm)와 숫자를 바꿔 외우지 않도록 주의.'},
+ {q:'다음 중 실기시험 실격 사유가 <b>아닌</b> 것은?',o:['지급 재료에 이상이 있어 감독위원 판단으로 교환한 경우','가스 주입 후 가스가 누설되는 작품','지급된 재료 이외의 재료를 사용한 작품','시험시간 내에 작품을 제출하지 못한 경우'],a:0,
+  e:'재료 이상은 <b>감독위원이 인정하면 교환 가능</b>하다. 수험자가 임의로 다른 재료를 쓰면 실격.'},
+ {q:'[시험 2] 제어작업에서 공기압 조정 유닛의 공급 압력 설정값은?',o:['0.4 MPa ± 0.05 MPa','0.5 MPa ± 0.05 MPa','0.6 MPa ± 0.1 MPa','0.4 MPa ± 0.5 MPa'],a:0,
+  e:'조립작업의 질소 <b>0.5 MPa</b>와 헷갈리기 쉽다. 제어작업 공압은 <b>0.4 MPa ± 0.05</b>.'},
+ {q:'제어작업에서 케이블 타이의 끝은 얼마 이내로 절단해야 하는가?',o:['1 mm 이내','5 mm 이내','10 mm 이내','제한 없음'],a:0,
+  e:'<b>1 mm 이내</b>. 남은 끝이 날카로우면 작업자가 다치기 때문이다. 정리 상태도 채점 대상이다.'},
+ {q:'정전 용량형 센서의 배선 순서로 옳은 것은?',o:['센서 → 단자대 → PLC','센서 → PLC → 단자대','PLC → 센서 → 단자대','센서 → PLC 직결'],a:0,
+  e:'반드시 <b>센서 → 단자대 → PLC</b> 순서로 (+, −, signal) 연결한다.'},
+ {q:'제어작업에서 사용할 수 <b>없는</b> 부품은?',o:['실린더 부착형 속도제어밸브','체크밸브 붙이 유량조절밸브','5포트 2위치 솔레노이드 밸브','리밋스위치'],a:0,
+  e:'실린더에 직접 붙이는 속도제어밸브는 <b>사용 불가</b>. 별도의 유량조절밸브로 속도를 잡아야 한다.'},
+ {q:'공압에서 실린더 속도 제어에 주로 쓰는 방식은?',o:['미터 아웃 (배기 쪽 조임)','미터 인 (공급 쪽 조임)','블리드 오프','압력 제어'],a:0,
+  e:'공기는 압축성이 있어 미터 인으로 조이면 <b>덜컥거림(스틱슬립)</b>이 생긴다. 그래서 <b>미터 아웃</b>이 기본이다.'},
+ {q:'“실린더1 전진 중 녹색램프 점등”에서 램프가 꺼지는 시점은?',o:['전진이 완료된 순간','후진이 시작될 때','후진이 완료될 때','한 사이클이 끝날 때'],a:0,
+  e:'<b>전진 중</b> = 전진 시작 ~ 전진완료까지. 완료되는 순간 조건이 끝나므로 램프가 꺼진다.'},
+ {q:'“동작 중”의 정의로 옳은 것은?',o:['전진 시작~후진완료, 후진 시작~전진완료','전진완료 상태만','후진완료 상태만','전진 시작~전진완료만'],a:0,
+  e:'“동작 중”은 나갈 때와 들어올 때를 <b>모두</b> 포함한다. “전진 중”보다 넓은 개념이다.'},
+ {q:'변위단계선도에서 세로축의 0과 1은 실린더의 무엇을 뜻하는가?',o:['0 = 후진완료, 1 = 전진완료','0 = 정지, 1 = 동작','0 = 전진완료, 1 = 후진완료','0 = 소등, 1 = 점등'],a:0,
+  e:'실린더는 <b>0=후진완료 / 1=전진완료</b>, 램프는 0=소등 / 1=점등이다.'},
+ {q:'변위단계선도의 가로축에 “8 = 1”이라 쓰여 있는 뜻은?',o:['8단계에서 처음 상태로 돌아와 1사이클이 끝난다','8초가 걸린다','8번 반복한다','8번째 실린더를 뜻한다'],a:0,
+  e:'마지막 단계가 1단계와 같은 상태 = <b>1사이클 완료</b>. 연속동작은 이 사이클을 지정 횟수만큼 반복한다.'},
+ {q:'스위치 2와 스위치 3의 차이는?',o:['2는 1사이클(단속), 3은 지정 사이클(연속)','2는 테스트, 3은 단속','2는 비상정지, 3은 연속','차이가 없다'],a:0,
+  e:'스위치 1=테스트 동작, <b>2=단속동작(1사이클)</b>, <b>3=연속동작(3~5사이클)</b>.'},
+ {q:'부가조건 1·2는 언제 채점하는가?',o:['연속동작이 정상동작할 때','테스트동작이 정상동작할 때','하드웨어 구성이 끝났을 때','항상 채점한다'],a:0,
+  e:'<b>연속동작이 정상동작해야</b> 부가조건을 채점한다. 그래서 연속동작을 먼저 완성해야 한다.'},
+ {q:'공개문제에서 램프 점멸의 표준 주기는?',o:['1초 ON / 1초 OFF','0.5초 ON / 0.5초 OFF','2초 ON / 2초 OFF','3초 ON / 3초 OFF'],a:0,
+  e:'거의 모든 세트가 <b>1초 ON / 1초 OFF</b>다. 타이머 2개를 서로 물려 반복시킨다.'},
+ {q:'“모든 동작은 시스템을 리셋하지 않은 상태에서 재동작이 가능하도록” 하려면?',o:['사이클 종료 시 내부 스텝 릴레이를 스스로 초기화해야 한다','전원을 껐다 켜면 된다','비상정지를 눌렀다 놓으면 된다','PLC를 STOP → RUN 하면 된다'],a:0,
+  e:'사람이 손대지 않아도 <b>프로그램이 스스로</b> 초기 상태로 돌아가야 한다는 뜻이다.'},
+ {q:'제어작업에서 프로그램 구성 방법으로 옳은 것은?',o:['테스트·단속·연속 동작을 하나의 프로그램에 모두 구성','동작별로 프로그램 파일을 나눠 제출','테스트 동작만 프로그램하고 나머지는 수동','연속동작만 프로그램'],a:0,
+  e:'요구사항에 <b>“하나의 프로그램에서 구성”</b>이라고 명시되어 있다.'},
+ {q:'공기압 회로도에서 한쪽에만 솔레노이드가 있고 반대쪽에 스프링(∿)이 있는 밸브는?',o:['편솔(싱글 솔레노이드) — 신호를 끊으면 스프링이 되돌린다','양솔(더블 솔레노이드) — 그 자리를 유지한다','수동 밸브','체크 밸브'],a:0,
+  e:'<b>편솔</b>은 신호가 끊기면 스프링이 원위치로 되돌린다. <b>양솔</b>은 마지막 신호 위치를 유지한다.'},
+ {q:'배치도에서 LS와 S는 각각 무엇인가?',o:['LS = 리밋스위치, S = 센서','LS = 램프, S = 스위치','LS = 로드스위치, S = 솔레노이드','LS = 리밋스위치, S = 스프링'],a:0,
+  e:'배치도 설명에 <b>LS: 리밋스위치, S: 센서</b>로 명시되어 있다.'},
+ {q:'실기 두 과제 중 하나가 0점이면?',o:['전체 실격으로 채점 대상에서 제외된다','0점인 과제만 빼고 채점한다','재응시 기회를 준다','다른 과제 점수로 합격할 수 있다'],a:0,
+  e:'조립·제어 중 <b>하나라도 0점</b>이면 실격이다. 두 과제를 모두 완성하는 것이 최우선.'},
+ {q:'BA Grade 튜브를 쓰는 이유로 가장 적절한 것은?',o:['내부를 광휘소둔해 표면이 매끈하여 초청정 가스 배관에 적합하다','값이 싸다','굽히기 쉽다','자석에 붙지 않는다'],a:0,
+  e:'BA = Bright Annealed. 내면이 매끈해 <b>이물질·수분이 붙지 않아</b> 반도체 가스 라인에 쓴다.'},
+ {q:'튜브를 자른 뒤 반드시 해야 하는 작업은?',o:['버(burr) 제거 — 디버링','도금','열처리','용접'],a:0,
+  e:'절단면 안쪽 턱이 남으면 가스 흐름을 막고 <b>파티클</b>이 된다. 페럴도 제대로 물지 못한다.'},
+ {q:'벤딩 시 90°를 정확히 만들기 위해 고려해야 하는 현상은?',o:['스프링백 — 굽혔다 놓으면 조금 되돌아온다','열팽창','크리프','피로파괴'],a:0,
+  e:'<b>스프링백</b>만큼 더 굽혔다 놓아야 원하는 각도가 나온다.'}
+];
+let cbt=null;
+function startCbt(){
+  const qs=shuffle(BANK).slice(0,20).map(q=>{const ans=q.o[q.a],o=shuffle(q.o);return{...q,o,a:o.indexOf(ans)};});
+  cbt={qs,i:0,ok:0,wrong:[]}; renderCbt();
+}
+function renderCbt(){
+  if(cbt.i>=cbt.qs.length){
+    const sc=Math.round(cbt.ok/cbt.qs.length*100);
+    if(!best.cbt||sc>best.cbt){best.cbt=sc;store.set('best',best);}
+    return gameResult('✅ 실기 점검', cbt.ok, cbt.qs.length, cbt.wrong, startCbt, sc);
+  }
+  const it=cbt.qs[cbt.i];
+  $('sc').innerHTML=`
+  <div class="card">
+    <div style="display:flex"><div class="pill">✅ 실기 점검 ${cbt.i+1} / ${cbt.qs.length}</div>
+      <div class="score" style="flex:1">맞은 개수 ${cbt.ok}</div></div>
+    <div class="qtext" style="margin-top:12px">${it.q}</div>
+    <div id="opts">${it.o.map((v,i)=>`<button class="opt" data-i="${i}">${i+1}. ${v}</button>`).join('')}</div>
+    <div id="exp"></div>
+  </div>`;
+  foot('');
+  $('opts').querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    const pick=+b.dataset.i, ok=pick===it.a;
+    $('opts').querySelectorAll('.opt').forEach((x,i)=>{x.onclick=null;
+      if(i===it.a)x.classList.add('ok'); else if(i===pick)x.classList.add('no'); else x.classList.add('dim');});
+    if(ok){cbt.ok++;fxOK();}else{cbt.wrong.push(it.q.replace(/<[^>]+>/g,'')+` → ${it.o[it.a]}`);fxNO();}
+    $('exp').innerHTML=`<div class="exp"><b>${ok?'정답':'정답은 '+(it.a+1)+'번'}</b> · ${it.e}</div>`;
+    foot(`<button class="btn" id="nx">${cbt.i===cbt.qs.length-1?'결과 보기':'다음 →'}</button>`);
+    $('nx').onclick=()=>{cbt.i++;renderCbt();};
+  });
+}
+
+/* ═══════ 결과 화면 ═══════ */
+function gameResult(title, ok, tot, wrong, retry, score){
+  const sc = score!==undefined?score:Math.round(ok/tot*100);
+  // 계급 정산
+  let rk=null;
+  if(window.Rank){ try{ rk=Rank.award(sc,{mode:title}); }catch(e){} }
+  $('sc').innerHTML=`
+  <div class="card" style="text-align:center">
+    <div class="pill">${title}</div>
+    <div style="font-size:44px;font-weight:900;margin:12px 0 2px;color:${sc>=60?'var(--good)':'var(--bad)'}">${sc}점</div>
+    <div class="sub">${tot}문항 중 <b class="hi">${ok}개</b> 정답${score!==undefined?` · ${sc>=60?'합격선 통과':'합격선 60점 미달'}`:''}</div>
+    ${best.cbt&&score!==undefined?`<div class="muted">최고 기록 ${best.cbt}점</div>`:''}
+  </div>
+  ${rk?`<div class="card">${Rank.resultBox(rk)}</div>`:''}
+  ${wrong.length?`<div class="card"><div class="pill">틀린 문제</div>
+    <ul style="font-size:13.5px">${wrong.map(w=>`<li>${w}</li>`).join('')}</ul></div>`
+   :`<div class="card"><b class="hi">틀린 문제가 하나도 없습니다.</b></div>`}
+  <div id="rcbox"></div>`;
+  foot(`<button class="btn ghost" id="rr">🔁 다시</button><button class="btn" onclick="goHome()">🏠 홈으로</button>`);
+  $('rr').onclick=retry;
+  // 승급 연출
+  if(rk&&rk.tierUp&&window.FX&&FX.banner)
+    FX.banner({icon:rk.tierAfter.icon,title:`${rk.tierAfter.name} 승급!`,
+      sub:`${rk.after} RP · ${title}`,stars:3,btn:'좋아',onClose:()=>{}});
+  else if(rk&&rk.promoted&&window.FX&&FX.burst) FX.burst({type:'ok'});
+  // 결과 제출 위젯 (?rc= 로 열었을 때만) — 계급도 함께 보냅니다
+  if(window.Collector&&Collector.mount){
+    try{ Collector.mount($('rcbox'),{score:sc,total:tot,correct:ok,
+      detail:title+(rk?` · ${rk.tierAfter.full} ${rk.after}RP`:'')}); }catch(e){}
+  }
+}
+
+/* ═══════ 계급표 · 기록 ═══════ */
+function openRank(){
+  const r=window.Rank?Rank.get():null;
+  if(!r){ $('sc').innerHTML='<div class="card">계급 위젯을 불러오지 못했습니다.</div>'; return; }
+  const log=Rank.history();
+  $('sc').innerHTML=`
+  <h1 style="font-size:20px">🏆 계급표</h1>
+  <div class="sub">게임과 점검을 풀면 <b class="hi">RP(랭크 포인트)</b>가 오르고 계급이 올라갑니다.</div>
+  <div class="card">${Rank.card(r)}</div>
+
+  <div class="card">
+    <div class="pill">계급 사다리</div>
+    <table style="margin-top:9px">
+      <tr><th>계급</th><th>필요 RP</th></tr>
+      ${Rank.tiers.map((t,i)=>{
+        const nx=Rank.tiers[i+1];
+        return `<tr style="${i===r.tier.idx?'background:rgba(124,198,255,.10)':''}">
+          <td>${t.icon} <b style="color:${t.c}">${t.name}</b>${i===r.tier.idx?' <span class="muted">← 현재</span>':''}</td>
+          <td>${t.min} ${nx?`~ ${nx.min-1}`:'이상'}</td></tr>`;}).join('')}
+    </table>
+    <div class="muted" style="margin-top:7px">골드부터는 세부 계급이 Ⅳ→Ⅰ로 나뉩니다.</div>
+  </div>
+
+  <div class="card">
+    <div class="pill">RP 계산 방식</div>
+    <ul style="font-size:13.5px">
+      <li><b class="hi">55점</b>이 본전입니다. 그 위로는 오르고 아래로는 내려갑니다</li>
+      <li><b class="hi">100점</b>이면 퍼펙트 보너스 <b>+12 RP</b></li>
+      <li><b class="hi">3연승</b>부터 연승 보너스(최대 +15 RP)</li>
+      <li>떨어질 때는 <b>최대 −22 RP</b>까지만, 아이언·브론즈는 더 적게 깎입니다</li>
+    </ul>
+    <div class="muted">최고 기록 ${r.bestRp} RP · 최다 연승 ${r.bestStreak}연승 · 총 ${r.plays}판</div>
+  </div>
+
+  ${log.length?`<div class="card"><div class="pill">최근 기록</div>
+    <table style="margin-top:9px"><tr><th>모드</th><th>점수</th><th>RP</th></tr>
+    ${log.slice(0,12).map(x=>`<tr><td style="font-size:12.5px">${x.m||'-'}</td><td>${x.s}점</td>
+      <td style="color:${x.g>=0?'var(--good)':'var(--bad)'};font-weight:800">${x.g>=0?'+':''}${x.g}</td></tr>`).join('')}
+    </table></div>`:''}
+
+  <div class="card">
+    <div class="rowbtn"><button class="btn ghost" id="rkReset">↺ 계급 초기화</button></div>
+    <div class="muted" style="margin-top:6px">이 기기에만 저장됩니다. 초기화하면 되돌릴 수 없습니다.</div>
+  </div>`;
+  foot(`<button class="btn" onclick="goHome()">🏠 홈으로</button>`);
+  $('rkReset').onclick=()=>{ if(confirm('계급과 RP를 모두 초기화할까요?')){ Rank.reset(); openRank(); } };
+}
+
+$('btnHome').onclick=()=>{stopSim();goHome();};
+window.addEventListener('resize',()=>{ if($('tk1')){ [1,2,3].forEach(n=>{const t=$('tk'+n); if(t)setRod(n,t.dataset.ext==='1');}); } });
+goHome();
+</script>
