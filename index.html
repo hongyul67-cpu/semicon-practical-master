@@ -725,6 +725,13 @@ function renderCbt(){
 }
 
 /* ═══════ 결과 화면 ═══════ */
+/* 생기부 — 같은 활동을 몇 번째 도전하는지 세어 둔다(제출 payload 의 retry) */
+function bumpTry(m){
+  var d={}; try{ d=JSON.parse(localStorage.getItem('try_semiconSilgi'))||{}; }catch(e){}
+  d[m]=(d[m]||0)+1;
+  try{ localStorage.setItem('try_semiconSilgi', JSON.stringify(d)); }catch(e){}
+  return d[m];
+}
 function gameResult(title, ok, tot, wrong, retry, score){
   const sc = score!==undefined?score:Math.round(ok/tot*100);
   // 계급 정산
@@ -749,6 +756,10 @@ function gameResult(title, ok, tot, wrong, retry, score){
     $('rcGo').onclick=()=>{
       if(!window.ResultCollector) return;
       ResultCollector.open({score:sc, correct:ok, total:tot,
+        /* 생기부 — 활동명·도전횟수·계급 */
+        mode:'반도체설비보전 실기 — '+title,
+        retry:bumpTry(title),
+        tier: window.Rank ? Rank.get().tier.full : undefined,
         wrong:wrong.map((_,i)=>i+1), durationSec:0,
         detail:title+(rk?` · ${rk.tierAfter.full} ${rk.after}RP`:'')});
     };
