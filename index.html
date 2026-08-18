@@ -751,19 +751,27 @@ function gameResult(title, ok, tot, wrong, retry, score){
   <div id="rcbox"></div>`;
   // 결과 제출 버튼 — ?rc=<교사 Apps Script exec> 로 열었을 때만 보입니다
   const hasRC=(window.ResultCollector&&ResultCollector.config&&ResultCollector.config.endpoint)||/[?&]rc=/.test(location.search);
-  if(hasRC){
-    $('rcbox').innerHTML=`<button class="btn" id="rcGo" style="width:100%;background:linear-gradient(180deg,#3ad995,#22a873)">📨 선생님께 결과 제출</button>`;
-    $('rcGo').onclick=()=>{
-      if(!window.ResultCollector) return;
-      ResultCollector.open({score:sc, correct:ok, total:tot,
-        /* 생기부 — 활동명·도전횟수·계급 */
-        mode:'반도체설비보전 실기 — '+title,
-        retry:bumpTry(title),
-        tier: window.Rank ? Rank.get().tier.full : undefined,
-        wrong:wrong.map((_,i)=>i+1), durationSec:0,
-        detail:title+(rk?` · ${rk.tierAfter.full} ${rk.after}RP`:'')});
-    };
-  }
+  /* 제출 버튼은 ?rc= 링크가 아니어도 항상 보인다 (규약 §1 ③) */
+  $('rcbox').innerHTML=`<button class="btn" id="rcGo" style="width:100%;background:linear-gradient(180deg,#3ad995,#22a873)">📨 선생님께 결과 제출</button>`;
+  $('rcGo').onclick=()=>{
+    if(!hasRC){
+      alert(['이 링크로는 제출이 되지 않아요.','',
+        '선생님이 나눠 준 제출용 링크(주소 뒤에 ?rc=... 가 붙은 링크)로',
+        '들어와야 반·번호를 입력하고 결과를 보낼 수 있습니다.','',
+        '연습은 지금 이대로 계속 하셔도 됩니다.'].join(String.fromCharCode(10)));
+      return;
+    }
+    if(!window.ResultCollector) return;
+    ResultCollector.open({score:sc, correct:ok, total:tot,
+      /* 생기부 — 활동명·도전횟수·계급 (다른 세션 작업 유지) */
+      mode:'반도체설비보전 실기 — '+title,
+      retry:bumpTry(title),
+      tier: window.Rank ? Rank.get().tier.full : ((rk&&rk.tierAfter)?rk.tierAfter.full:undefined),
+      wrong:wrong.slice(),          /* 이미 무엇을 틀렸는지 적힌 문장들 (규약 §1 ②) */
+      durationSec:0,
+      extra:['실기 과제 수행'],
+      detail:title+(rk?` · ${rk.tierAfter.full} ${rk.after}RP`:'')});
+  };
   foot(`<button class="btn ghost" id="rr">🔁 다시</button><button class="btn" onclick="goHome()">🏠 홈으로</button>`);
   $('rr').onclick=retry;
   // 승급 연출
